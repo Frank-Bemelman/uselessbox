@@ -7,10 +7,13 @@ And then the arm goes back and the box closes again.
 The following hardware is used:
 
 1) ESP8266 controller (D1 mini or similar
-2) Two small RC servos, one for the lid and one for the arm
-3) A toggle switch
-4) A small piece of ledstrip with 6 pixel leds (2812)
-5) A small audio amplifier
-6) A small loudspeaker
+https://github.com/Frank-Bemelman/uselessbox/blob/main/pictures/esp-processor-module.jpg
+
+   
+3) Two small RC servos, one for the lid and one for the arm
+4) A toggle switch
+5) A small piece of ledstrip with 6 pixel leds (2812)
+6) A small audio amplifier
+7) A small loudspeaker
 
 
