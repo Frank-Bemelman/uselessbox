@@ -10,23 +10,23 @@ The following hardware is used:
 ![alt text](pictures/esp-processor-module.jpg)
 <br>
 
-3) Two small RC servos, one for the lid and one for the arm
+2) Two small RC servos, one for the lid and one for the arm
 ![alt text](pictures/servo.jpg)
 <br>
 
-4) A toggle switch
+3) A toggle switch
 ![alt text](pictures/schakelaar.jpg)
 <br>
 
-5) A small piece of ledstrip with 6 pixel leds (2812)
+4) A small piece of ledstrip with 6 pixel leds (2812)
 ![alt text](pictures/ledstrip.jpg)
 <br>
 
-6) A small audio amplifier
+5) A small audio amplifier
 ![alt text](pictures/versterker-audio.jpg)
 <br>
 
-7) A small loudspeaker
+6) A small loudspeaker
 ![alt text](pictures/luidspreker.jpg)
 <br>
 
