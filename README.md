@@ -7,7 +7,7 @@ And then the arm goes back and the box closes again.
 The following hardware is used:
 
 1) ESP8266 controller (D1 mini or similar
-https://github.com/Frank-Bemelman/uselessbox/blob/main/pictures/esp-processor-module.jpg
+![alt text](https://github.com/Frank-Bemelman/uselessbox/blob/main/pictures/esp-processor-module.jpg)
 
    
 3) Two small RC servos, one for the lid and one for the arm
