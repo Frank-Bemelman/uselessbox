@@ -38,8 +38,11 @@ Board NODEMCU 1.0 ESP-12E Module
 Flashsize: 4MB (FS:2MB OTA~: 1019KB)
 
 Libraries needed:
+<br>
 ESP2866Audio by Earle. F. Philhower Version 1.9.7
+<br>
 Servo by Arduino 1.2.0
+<br>
 FastLED by Daniel Garcia Version 3.6.0
 
 
