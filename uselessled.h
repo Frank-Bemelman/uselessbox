@@ -74,13 +74,16 @@ void PasKleurenAan(void)
 { // afhankelijk van waar we in de animatie zitten, doen we het een of het ander
   switch(animatieFase)
   { case 0: // kastje is in rust
-      leds[0].setRGB(0, 0, 0);
-      leds[1].setRGB(0, 0, 0);
-      leds[2].setRGB(0, 0, 0);
-      leds[3].setRGB(0, 0, 0);
-      leds[4].setRGB(0, 0, 0);
-      leds[5].setRGB(0, 0, 0);
-      FastLED.show(); // en stuur het naar de ledstrip
+      Serial.print("animatieFase="); Serial.println(animatieFase);
+//      if(vorigeAnimatieFase != animatieFase) // alleen de eerste keer honoreren
+      { leds[0].setRGB(0, 0, 0);
+        leds[1].setRGB(0, 0, 0);
+        leds[2].setRGB(0, 0, 0);
+        leds[3].setRGB(0, 0, 0);
+        leds[4].setRGB(0, 0, 0);
+        leds[5].setRGB(0, 0, 0);
+        FastLED.show(); // en stuur het naar de ledstrip
+      }  
       break;
     case 1: // animatie begint vanwege de schakelaar
       break;
