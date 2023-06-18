@@ -32,4 +32,16 @@ The following hardware is used:
 
 Load files into the Arduino IDE and save as a new sketch.
 
+Arduino IDE settings:
+Board Manager URL's: http://arduino.esp8266.com/stable/package_esp8266com_index.json,https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+Board NODEMCU 1.0 ESP-12E Module
+Flashsize: 4MB (FS:2MB OTA~: 1019KB)
+
+Libraries needed:
+ESP2866Audio by Earle. F. Philhower Version 1.9.7
+Servo by Arduino 1.2.0
+FastLED by Daniel Garcia Version 3.6.0
+
+
+
 
