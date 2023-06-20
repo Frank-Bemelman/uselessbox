@@ -1,7 +1,4 @@
 
-#include <arduino.h>
-#include <ESP8266WiFi.h>
-#include <Servo.h>
 #include "uselessled.h"
 
 // we gebruiken twee servo motortjes, een voor de deksel en een voor het armpje
@@ -9,31 +6,24 @@
 // de stuurdraadjes van de servo's zijn aangesloten op D3 (deksel) en D1 (armpje) van de printplaat
 Servo ServoDeksel, ServoArmpje; 
 
-
-
 // de versterker word aangestuurd met 3 signalen en 5V voeding (+5V en GND)
 // van links naar rechts, LRC, BCLK, DIN, GAIN, SD, GND en VIN
 // LCR gaat naar D4
 // BCLK gaat naar D8
 // DIN gaat naar RX
 
-#include "AudioFileSourcePROGMEM.h"
-#include "AudioGeneratorWAV.h"
-#include "AudioOutputI2S.h"
-
-// de muziek en geluidseffecten die we gebruiken
+// de muziek en geluidseffecten die we kunnen gebruiken
 #include "music.h"
+#include "jingle2.h"
+#include "drumroll.h"
+#include "piepdeur.h"
 #include "lach.h"
+#include "lach2.h"
 #include "blijferaf.h"
-
-AudioGeneratorWAV *wav;
-AudioFileSourcePROGMEM *file;
-AudioOutputI2S *out;
-
 
 
 void setup() {
-  // Alle code in dit deel wordt alleen bij opstarten 1x uitgevoerd
+  // Alle code in dit setup deel wordt alleen bij opstarten 1x uitgevoerd
   WiFi.mode(WIFI_OFF); // geen wifi functies, spaart stroom ook
   
   // hier de servo's aansluitingen opgeven en ze in de nul stand zetten
@@ -49,127 +39,130 @@ void setup() {
   Serial.begin(115200);
   Serial.println("We zijn begonnen!");
 
-  // audio benodigdheden
+  // audio benodigdheden voor de geluidjes
   audioLogger = &Serial;
-  file = new AudioFileSourcePROGMEM( jingle, sizeof(jingle) );
   out = new AudioOutputI2S();
   wav = new AudioGeneratorWAV();
 
-  #ifdef LEDS
-  ledSetup();
-  #endif
+  // dit is nodig om het stripje met de 6 leds te laten werken
+  SetupLedStrip();
    
 }
 
 
-int animatieFase = 0;
-int animatieStart = 0;
-int animatieTimer = 0;
-int angle;
-int armSlag;
+int AnimatieFase = 0;
+int AnimatieStart = 0;
+int AnimatieTimer = 0;
+int Angle;
+int ArmSlag;
+int LoterijGetal;
 
 void loop() {
   // dit is het hoofdprogramma, hier gebeurt het allemaal
   // het is een lus die continue en razendsnel doorlopen wordt
   
-  animatieTimer = millis()-animatieStart;
-  #ifdef LEDS
-  updateLeds();
-  #endif
-
-  switch(animatieFase)
+  AnimatieTimer = millis()-AnimatieStart;
+  LoterijGetal = random(100);
+  
+  // afhankelijk van de AnimatieFase waar we in verkeren, schakelen we naar de bijbehorende 'case'.
+  switch(AnimatieFase)
   { case 0:
       if(!wav->isRunning()) // er speelt geen muziekje
       { if(digitalRead(4) == LOW)
         { // de schakelaar is gesloten 
-          animatieFase = 1;
+          AnimatieFase = 1;
         }
       }  
       break;
 
     case 1: // eerste stap na sluiten schakelaar, start de muziek 
-      animatieStart = millis(); // tijdstip van start moment
-      file = new AudioFileSourcePROGMEM( jingle, sizeof(jingle) );
+      AnimatieStart = millis(); // tijdstip van start moment
+      if (LoterijGetal > 75) file = new AudioFileSourcePROGMEM( jingle, sizeof(jingle) );
+      else if (LoterijGetal > 50) file = new AudioFileSourcePROGMEM( jingle2, sizeof(jingle2) );
+      else if (LoterijGetal > 25) file = new AudioFileSourcePROGMEM( drumroll, sizeof(drumroll) );
+      else file = new AudioFileSourcePROGMEM( piepdeur, sizeof(piepdeur) );
+      
       wav->begin(file, out);
-      animatieFase = 2;
+      AnimatieFase = 2;
       break;
 
     case 2: // nu de deksel openen
-      Serial.printf("animatieTimer = %d\n", animatieTimer);
-      if(animatieTimer < 3000)
-      { angle = (animatieTimer * 180)/ 3000;
-        Serial.printf("angle = %d\n", angle);
-        ServoDeksel.write(angle);
+//      Serial.printf("animatieTimer = %d\n", AnimatieTimer);
+      if(AnimatieTimer < 3000)
+      { Angle = (AnimatieTimer * 180)/ 3000;
+        Serial.printf("Angle = %d\n", Angle);
+        ServoDeksel.write(Angle);
       }
       else // tijd van openen is verstreken, straks verder met het armpje
-      { animatieFase = 3;
+      { AnimatieFase = 3;
         // willekeurig getal van 0 t/m 99
         if(random(100)<70) // in 70% het geval
-        { armSlag = 90; // volle slag
+        { ArmSlag = 90; // volle slag
         }
         else 
-        { armSlag = 60; // soms dus een korte slag die het niet haalt
+        { ArmSlag = 60; // soms dus een korte slag die het niet haalt
         }
       }
       break;
 
     case 3: // nu het armpje naar buiten
-      Serial.printf("animatieTimer = %d\n", animatieTimer);
-      if(animatieTimer > 4000 && animatieTimer < 5000 )
-      { angle = ((animatieTimer-4000) * armSlag)/ 1000;
-        Serial.printf("angle = %d\n", angle);
-        ServoArmpje.write(angle);
+      Serial.printf("AnimatieTimer = %d\n", AnimatieTimer);
+      if(AnimatieTimer > 4000 && AnimatieTimer < 5000 )
+      { Angle = ((AnimatieTimer-4000) * ArmSlag)/ 1000;
+        Serial.printf("Angle = %d\n", Angle);
+        ServoArmpje.write(Angle);
       }
-      if(animatieTimer>5000)
-      { animatieFase = 4;
+      if(AnimatieTimer>5000)
+      { AnimatieFase = 4;
       }
       break;
 
     case 4:
       // armpje in
       ServoArmpje.write(0);
-      animatieFase = 5;
+      AnimatieFase = 5;
       break;  
 
     case 5:
       // deksel dicht als muziek klaar is
       if(!wav->isRunning()) // er speelt geen muziekje meer
-      { if(animatieTimer>5500)
+      { if(AnimatieTimer>5500)
         { ServoDeksel.write(0);
-          animatieFase = 6;
+          AnimatieFase = 6;
         }  
       }
       break;  
 
     case 6: 
       if(digitalRead(4) == LOW) // als de schakelaar niet is omgezet, even wachten en dan opnieuw proberen  
-      { if(animatieTimer > 7000) 
-        { animatieStart = millis(); // tijdstip van start moment resetten
+      { if(AnimatieTimer > 7000) 
+        { AnimatieStart = millis(); // tijdstip van start moment resetten
           file = new AudioFileSourcePROGMEM( blijferaf, sizeof(blijferaf) );
           wav->begin(file, out);
-          animatieFase = 2;
+          AnimatieFase = 2;
         }  
       }
-      else animatieFase = 7;
+      else AnimatieFase = 7;
       break;
 
     case 7: // kist is dicht, schakelaar is in rust, nu even wachten en dan de lach 
-      if(animatieTimer > 9000)
-      { file = new AudioFileSourcePROGMEM( lach, sizeof(lach) );
+      if(AnimatieTimer > 9000)
+      { if (LoterijGetal > 50) file = new AudioFileSourcePROGMEM( lach, sizeof(lach) );
+        else file = new AudioFileSourcePROGMEM( lach2, sizeof(lach2) );
         wav->begin(file, out);
-        animatieFase = 8;       
+        AnimatieFase = 8;       
       }
       else
       { // of je zet de schakelaar meteen weer aan, dan geen lach, maar opnieuw starten
         if(digitalRead(4) == LOW)
-        { animatieFase = 1;
+        { AnimatieFase = 1;
         }
       }
       break;
 
     case 8:
       if(!wav->isRunning()) // uitgelachen
-      { animatieFase = 0;
+      { AnimatieFase = 0;
       }
       else
       { if(digitalRead(4) == LOW) // tijdens het lachen de schakelaar al omzetten ?
@@ -179,7 +172,7 @@ void loop() {
       break;
             
     default:
-      animatieFase = 0;
+      AnimatieFase = 0;
       break;    
   }
   
@@ -190,6 +183,9 @@ void loop() {
       wav->stop();
     }
   } 
+
+  UpdateLedStrip(); // dit regelt het omschakelen van de led kleuren 
+
 
   // dit is het einde van de lus en springen we vanzelf weer naar boven, naar het begin van loop()
 }

@@ -1,11 +1,21 @@
+#include <arduino.h>
+#include <ESP8266WiFi.h>
+#include <Servo.h>
+#include "AudioFileSourcePROGMEM.h"
+#include "AudioGeneratorWAV.h"
+#include "AudioOutputI2S.h"
+
+AudioGeneratorWAV *wav;
+AudioFileSourcePROGMEM *file;
+AudioOutputI2S *out;
+
+
 // In deze file staan alle voorzieningen om het ledstripje van 6 pixels leds aan te sturen
 
 #include <FastLED.h>
 #define DATA_PIN D7 // deze pin, GPIO13 (D7) geeft de data door naar de ledstrip
 #define NUM_LEDS 6 // We hebben 6 leds op onze ledstrip
 CRGB leds[NUM_LEDS];
-
-//#define LEDS
 
 // tabel om de helderheid van de leds meer op een menselijke schaal te brengen
 uint8_t kcie[] = {
@@ -29,7 +39,7 @@ uint8_t getPWM (uint8_t index)
 }
 
 
-void ledSetup(void)
+void SetupLedStrip(void)
 { // koppelen van de leds aan een uitgang van de ESP8266 
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
 
@@ -50,7 +60,7 @@ int tiendeSecondes;
 int tiendeSecondesVorige;
 int tiendeTeller = 0;
   
-void updateLeds(void)
+void UpdateLedStrip(void)
 { milliSecondes = millis();
   tiendeSecondes = milliSecondes / 10;
   
@@ -62,63 +72,61 @@ void updateLeds(void)
 }
 
 // we gebruiken een variable uit het hoofd programma
-extern int animatieFase;
-extern int animatieTimer;
-uint8_t lichtSterkte;
-uint8_t lichtSterkteHuidig = 0;
+extern int AnimatieFase;
+extern int AnimatieTimer;
+uint8_t LichtSterkte;
+uint8_t LichtSterkteHuidig = 0;
 
-int lichtSterkteGecorrigeerd;
-int vorigeAnimatieFase = -1;
+int LichtSterkteGecorrigeerd;
+int VorigeAnimatieFase = -1;
 
 void PasKleurenAan(void)
 { // afhankelijk van waar we in de animatie zitten, doen we het een of het ander
-  switch(animatieFase)
+  switch(AnimatieFase)
   { case 0: // kastje is in rust
-      Serial.print("animatieFase="); Serial.println(animatieFase);
-//      if(vorigeAnimatieFase != animatieFase) // alleen de eerste keer honoreren
-      { leds[0].setRGB(0, 0, 0);
-        leds[1].setRGB(0, 0, 0);
-        leds[2].setRGB(0, 0, 0);
-        leds[3].setRGB(0, 0, 0);
-        leds[4].setRGB(0, 0, 0);
-        leds[5].setRGB(0, 0, 0);
-        FastLED.show(); // en stuur het naar de ledstrip
-      }  
+//      Serial.print("AnimatieFase="); Serial.println(AnimatieFase);
+      leds[0].setRGB(0, 0, 0);
+      leds[1].setRGB(0, 0, 0);
+      leds[2].setRGB(0, 0, 0);
+      leds[3].setRGB(0, 0, 0);
+      leds[4].setRGB(0, 0, 0);
+      leds[5].setRGB(0, 0, 0);
+      FastLED.show(); // en stuur het naar de ledstrip
       break;
     case 1: // animatie begint vanwege de schakelaar
       break;
     case 2: // deksel gaat langzaam open, hierbij loopt de animatieTimer van 0-3000 op, die gebruiken we om de lichtsterkte te laten oplopen tijdens het openen
-      lichtSterkte = (255 * animatieTimer) / 3000;
-      if(lichtSterkteHuidig !=  lichtSterkte)
-      { lichtSterkteHuidig =  lichtSterkte;
-        Serial.println(lichtSterkte);
-        lichtSterkte = getPWM (lichtSterkte);
+      LichtSterkte = (255 * AnimatieTimer) / 3000;
+      if(LichtSterkteHuidig !=  LichtSterkte)
+      { LichtSterkteHuidig =  LichtSterkte;
+        Serial.println(LichtSterkte);
+        LichtSterkte = getPWM (LichtSterkte);
         // we geven de lichtsterkte alleen aan de blauwe led (RGB, R=rood, G=groen, B-blauw) voor blauw licht
-        leds[0].setRGB(0, 0, lichtSterkte);
-        leds[1].setRGB(0, 0, lichtSterkte);
-        leds[2].setRGB(0, 0, lichtSterkte);
-        leds[3].setRGB(0, 0, lichtSterkte);
-        leds[4].setRGB(0, 0, lichtSterkte);
-        leds[5].setRGB(0, 0, lichtSterkte);
+        leds[0].setRGB(0, 0, LichtSterkte);
+        leds[1].setRGB(0, 0, LichtSterkte);
+        leds[2].setRGB(0, 0, LichtSterkte);
+        leds[3].setRGB(0, 0, LichtSterkte);
+        leds[4].setRGB(0, 0, LichtSterkte);
+        leds[5].setRGB(0, 0, LichtSterkte);
         FastLED.show(); // en stuur het naar de ledstrip
       }  
       break;
     case 3: // het armpje gaan in 1 seconde naar buiten, hierbij loopt de animatieTimer van 4000-5000 op, die gebruiken we om de lichtsterkte te laten oplopen tijdens het openen
       // van 3000-4000 is nog even wachten
-      if(animatieTimer<4000)
-      { if(vorigeAnimatieFase != animatieFase) // alleen de eerste keer honoreren
+      if(AnimatieTimer<4000)
+      { if(VorigeAnimatieFase != AnimatieFase) // alleen de eerste keer honoreren
         { // alle leds op geel, dat is rood en groen gemengd
           for(int i=0; i<NUM_LEDS; i++)leds[i].setRGB(255, 255, 0);
           FastLED.show(); // en stuur het naar de ledstrip
         }  
       }
       else // armpje gaat nu bewegen
-      { lichtSterkte = (255 * (animatieTimer-4000)) / 1000;
-        lichtSterkte = getPWM (lichtSterkte);
-        if(lichtSterkteHuidig !=  lichtSterkte)
-        { lichtSterkteHuidig =  lichtSterkte;
+      { LichtSterkte = (255 * (AnimatieTimer-4000)) / 1000;
+        LichtSterkte = getPWM (LichtSterkte);
+        if(LichtSterkteHuidig !=  LichtSterkte)
+        { LichtSterkteHuidig =  LichtSterkte;
           // we geven de lichtsterkte alleen aan de rode led (RGB, R=rood, G=groen, B-blauw) voor blauw licht
-          for(int i=0; i<NUM_LEDS; i++)leds[i].setRGB(lichtSterkte, 0, 0);      
+          for(int i=0; i<NUM_LEDS; i++)leds[i].setRGB(LichtSterkte, 0, 0);      
           FastLED.show(); // en stuur het naar de ledstrip
         }  
       }
@@ -126,30 +134,30 @@ void PasKleurenAan(void)
     case 4: // armpje naar binnen is gestart
       break;
     case 5: 
-     // tot animatieTimer 5500 is de tijd dat het armpje intrekt
+     // tot AnimatieTimer 5500 is de tijd dat het armpje intrekt
       for(int i=0; i<NUM_LEDS; i++)leds[i].setRGB(0, 255, 0);      
       FastLED.show(); // en stuur het naar de ledstrip
       break;
     case 6: 
       // nu is de deksel aan het zakken, duurt van 5500 tot 7000, maar de schakelaar staat niet goed
       // gaan we vanaf rood de leds dimmen
-      lichtSterkte = (255 * (7000 - animatieTimer)) / 1500;
-      lichtSterkte = getPWM (lichtSterkte);
-      for(int i=0; i<NUM_LEDS; i++)leds[i].setRGB(lichtSterkte, 0, 0);      
+      LichtSterkte = (255 * (7000 - AnimatieTimer)) / 1500;
+      LichtSterkte = getPWM (LichtSterkte);
+      for(int i=0; i<NUM_LEDS; i++)leds[i].setRGB(LichtSterkte, 0, 0);      
       FastLED.show(); // en stuur het naar de ledstrip
       break;
     case 7:
       // nu is de deskel aan het zakken, duurt van 5500 tot 7000
       // gaan we de groene leds dimmen, want de missie is geslaagd
-      if(animatieTimer<9000)
-      { lichtSterkte = (uint8_t)(255 * (7000 - animatieTimer)) / 1500;
-        lichtSterkte = getPWM (lichtSterkte);
-        for(int i=0; i<NUM_LEDS; i++)leds[i].setRGB(0, lichtSterkte, 0);      
+      if(AnimatieTimer<9000)
+      { LichtSterkte = (uint8_t)(255 * (7000 - AnimatieTimer)) / 1500;
+        LichtSterkte = getPWM (LichtSterkte);
+        for(int i=0; i<NUM_LEDS; i++)leds[i].setRGB(0, LichtSterkte, 0);      
         FastLED.show(); // en stuur het naar de ledstrip
       }  
       break;
     case 8: // de lachsalvo is gestart
-      if(vorigeAnimatieFase != animatieFase) // alleen de eerste keer honoreren
+      if(VorigeAnimatieFase != AnimatieFase) // alleen de eerste keer honoreren
       { // doe maar paars licht, dat piept misschien nog wel een beetje door de kier van de deksel
         for(int i=0; i<NUM_LEDS; i++)leds[i].setRGB(255, 0, 255);      
         FastLED.show(); // en stuur het naar de ledstrip
@@ -159,6 +167,6 @@ void PasKleurenAan(void)
       break;  
   }
 
-  vorigeAnimatieFase = animatieFase;
+  VorigeAnimatieFase = AnimatieFase;
 
 }
