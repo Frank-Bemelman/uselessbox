@@ -68,7 +68,8 @@ void loop() {
   // dit is het hoofdprogramma, hier gebeurt het allemaal
   // het is een lus die continue en razendsnel doorlopen wordt
   
-  AnimatieTimer = millis()-AnimatieStart;
+  UpdateAnimatieTimer();
+  
   LoterijGetal = random(100);
   
   // afhankelijk van de AnimatieFase waar we in verkeren, schakelen we naar de bijbehorende 'case'.
@@ -83,7 +84,7 @@ void loop() {
       break;
 
     case 1: // eerste stap na sluiten schakelaar, start de muziek 
-      AnimatieStart = millis(); // tijdstip van start moment
+      ResetAnimatieTimer(); // tijdstip van start moment
       if (LoterijGetal > 75) file = new AudioFileSourcePROGMEM( jingle, sizeof(jingle) );
       else if (LoterijGetal > 50) file = new AudioFileSourcePROGMEM( jingle2, sizeof(jingle2) );
       else if (LoterijGetal > 25) file = new AudioFileSourcePROGMEM( drumroll, sizeof(drumroll) );
@@ -143,7 +144,7 @@ void loop() {
     case 6: 
       if(digitalRead(4) == LOW) // als de schakelaar niet terug is gezet, even wachten en dan opnieuw proberen  
       { if(AnimatieTimer > 7000) 
-        { AnimatieStart = millis(); // tijdstip van start moment resetten
+        { ResetAnimatieTimer(); // tijdstip van start moment resetten
           file = new AudioFileSourcePROGMEM( blijferaf, sizeof(blijferaf) );
           wav->begin(file, out);
           AnimatieFase = 2;

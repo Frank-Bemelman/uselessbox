@@ -74,6 +74,8 @@ void UpdateLedStrip(void)
 // we gebruiken een variable uit het hoofd programma
 extern int AnimatieFase;
 extern int AnimatieTimer;
+extern int AnimatieStart;
+
 uint8_t LichtSterkte;
 uint8_t LichtSterkteHuidig = 0;
 
@@ -101,13 +103,13 @@ void PasKleurenAan(void)
       { LichtSterkteHuidig =  LichtSterkte;
 //        Serial.println(LichtSterkte);
         LichtSterkte = getPWM (LichtSterkte);
-        // we geven de lichtsterkte alleen aan de blauwe led (RGB, R=rood, G=groen, B-blauw) voor blauw licht
+        // we geven de lichtsterkte door aan alle leds in verschillende kleuren combinaties (RGB, R=rood, G=groen, B-blauw) voor blauw licht
         leds[0].setRGB(0, 0, LichtSterkte);
-        leds[1].setRGB(0, 0, LichtSterkte);
-        leds[2].setRGB(0, 0, LichtSterkte);
-        leds[3].setRGB(0, 0, LichtSterkte);
-        leds[4].setRGB(0, 0, LichtSterkte);
-        leds[5].setRGB(0, 0, LichtSterkte);
+        leds[1].setRGB(0, LichtSterkte, 0);
+        leds[2].setRGB(LichtSterkte, 0, 0);
+        leds[3].setRGB(LichtSterkte, 0, LichtSterkte);
+        leds[4].setRGB(0, LichtSterkte, LichtSterkte);
+        leds[5].setRGB(LichtSterkte, LichtSterkte, 0);
         FastLED.show(); // en stuur het naar de ledstrip
       }  
       break;
@@ -169,4 +171,13 @@ void PasKleurenAan(void)
 
   VorigeAnimatieFase = AnimatieFase;
 
+}
+
+void UpdateAnimatieTimer(void)
+{ AnimatieTimer = millis( )- AnimatieStart;
+}
+
+void ResetAnimatieTimer(void)
+{ AnimatieStart = millis();
+  UpdateAnimatieTimer();
 }
