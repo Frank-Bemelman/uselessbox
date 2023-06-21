@@ -5,6 +5,13 @@
 // deze zijn aangesloten op massa (G) en 5 volt (VIN) voor de energie
 // de stuurdraadjes van de servo's zijn aangesloten op D3 (deksel) en D1 (armpje) van de printplaat
 Servo ServoDeksel, ServoArmpje; 
+#define DEKSEL_DICHT 0  // Deksel dicht is 0 graden van de servo
+#define DEKSEL_OPEN  180 // Deksel open is 180 graden van de servo
+#define ARMPJE_IN    0  // Armpje naar binnen is 0 graden van de servo
+#define ARMPJE_UIT   90 // Armpje naar buiten is 90 graden van de servo
+#define ARMPJE_BIJNA 60 // Armpje niet helemaal buiten is 60 graden van de servo
+
+
 
 // de versterker word aangestuurd met 3 signalen en 5V voeding (+5V en GND)
 // van links naar rechts, LRC, BCLK, DIN, GAIN, SD, GND en VIN
@@ -26,11 +33,11 @@ void setup() {
   // Alle code in dit setup deel wordt alleen bij opstarten 1x uitgevoerd
   WiFi.mode(WIFI_OFF); // geen wifi functies, spaart stroom ook
   
-  // hier de servo's aansluitingen opgeven en ze in de nul stand zetten
-  ServoDeksel.attach(0, 544, 2500); // GPIO0 of ook wel D3 genoemd
-  ServoDeksel.write(0);  
-  ServoArmpje.attach(5, 544, 2500); // GPIO5 of ook wel D1 genoemd
-  ServoArmpje.write(0);  
+  // hier de servo's aansluitingen opgeven en ze in de rust stand zetten, armpje in en deksel dicht
+  ServoDeksel.attach(0, 544, 2500); // aansluiting GPIO0 of ook wel D3 genoemd
+  ServoDeksel.write(DEKSEL_DICHT);  
+  ServoArmpje.attach(5, 544, 2500); // aansluiting GPIO5 of ook wel D1 genoemd
+  ServoArmpje.write(ARMPJE_IN);  
 
   // de schakelaar is aangesloten op massa (G) en ingang D2 (GPIO4)
   // de ingang word ook voorzien van een positieve spanning om de stand van de schakelaar te kunnen detecteren
@@ -89,26 +96,26 @@ void loop() {
     case 2: // nu de deksel openen
 //      Serial.printf("animatieTimer = %d\n", AnimatieTimer);
       if(AnimatieTimer < 3000)
-      { Angle = (AnimatieTimer * 180)/ 3000;
+      { Angle = map(AnimatieTimer, 0, 3000, DEKSEL_DICHT, DEKSEL_OPEN);
         Serial.printf("Angle = %d\n", Angle);
         ServoDeksel.write(Angle);
       }
       else // tijd van openen is verstreken, straks verder met het armpje
-      { AnimatieFase = 3;
-        // willekeurig getal van 0 t/m 99
-        if(random(100)<70) // in 70% het geval
-        { ArmSlag = 90; // volle slag
+      { // willekeurig getal van 0 t/m 99
+        if (LoterijGetal < 70) // in 70% het geval
+        { ArmSlag = ARMPJE_UIT; // volle slag
         }
         else 
-        { ArmSlag = 60; // soms dus een korte slag die het niet haalt
+        { ArmSlag = ARMPJE_BIJNA; // soms dus een korte slag die het niet haalt
         }
+        AnimatieFase = 3; 
       }
       break;
 
     case 3: // nu het armpje naar buiten
-      Serial.printf("AnimatieTimer = %d\n", AnimatieTimer);
+//      Serial.printf("AnimatieTimer = %d\n", AnimatieTimer);
       if(AnimatieTimer > 4000 && AnimatieTimer < 5000 )
-      { Angle = ((AnimatieTimer-4000) * ArmSlag)/ 1000;
+      { Angle = map(AnimatieTimer, 4000, 5000, ARMPJE_IN, ArmSlag);
         Serial.printf("Angle = %d\n", Angle);
         ServoArmpje.write(Angle);
       }
@@ -119,7 +126,7 @@ void loop() {
 
     case 4:
       // armpje in
-      ServoArmpje.write(0);
+      ServoArmpje.write(ARMPJE_IN);
       AnimatieFase = 5;
       break;  
 
@@ -127,14 +134,14 @@ void loop() {
       // deksel dicht als muziek klaar is
       if(!wav->isRunning()) // er speelt geen muziekje meer
       { if(AnimatieTimer>5500)
-        { ServoDeksel.write(0);
+        { ServoDeksel.write(DEKSEL_DICHT);
           AnimatieFase = 6;
         }  
       }
       break;  
 
     case 6: 
-      if(digitalRead(4) == LOW) // als de schakelaar niet is omgezet, even wachten en dan opnieuw proberen  
+      if(digitalRead(4) == LOW) // als de schakelaar niet terug is gezet, even wachten en dan opnieuw proberen  
       { if(AnimatieTimer > 7000) 
         { AnimatieStart = millis(); // tijdstip van start moment resetten
           file = new AudioFileSourcePROGMEM( blijferaf, sizeof(blijferaf) );

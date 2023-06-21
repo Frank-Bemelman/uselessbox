@@ -99,7 +99,7 @@ void PasKleurenAan(void)
       LichtSterkte = (255 * AnimatieTimer) / 3000;
       if(LichtSterkteHuidig !=  LichtSterkte)
       { LichtSterkteHuidig =  LichtSterkte;
-        Serial.println(LichtSterkte);
+//        Serial.println(LichtSterkte);
         LichtSterkte = getPWM (LichtSterkte);
         // we geven de lichtsterkte alleen aan de blauwe led (RGB, R=rood, G=groen, B-blauw) voor blauw licht
         leds[0].setRGB(0, 0, LichtSterkte);
