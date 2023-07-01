@@ -33,7 +33,12 @@ The following hardware is used:
 Load files into the Arduino IDE and save as a new sketch.
 
 Arduino IDE settings:
+Under File -> preferences:
 Board Manager URL's: http://arduino.esp8266.com/stable/package_esp8266com_index.json,https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json<br>
+
+Under Sketch -> Tools -> Board -> Board Manager 
+
+
 Board NODEMCU 1.0 ESP-12E Module<br>
 Flashsize: 4MB (FS:2MB OTA~: 1019KB)<br>
 
