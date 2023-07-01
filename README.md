@@ -36,7 +36,7 @@ Arduino IDE settings:
 Under File -> preferences:
 Board Manager URL's: http://arduino.esp8266.com/stable/package_esp8266com_index.json,https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json<br>
 
-Under Sketch -> Tools -> Board -> Board Manager 
+Under Sketch -> Tools -> Board -> Board Manager -> ESP8266 by community 3.1.2 install
 
 
 Board NODEMCU 1.0 ESP-12E Module<br>
