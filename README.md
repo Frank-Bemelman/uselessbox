@@ -44,7 +44,7 @@ Flashsize: 4MB (FS:2MB OTA~: 1019KB)<br>
 
 Libraries needed:
 <br>
-ESP2866Audio by Earle. F. Philhower Version 1.9.7
+ESP8266Audio by Earle. F. Philhower Version 1.9.7
 <br>
 Servo by Arduino 1.2.0
 <br>
