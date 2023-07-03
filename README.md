@@ -12,6 +12,7 @@ The following hardware is used:
 
 2) Two small RC servos, one for the lid and one for the arm
 ![alt text](pictures/servo.jpg)
+![alt text](pictures/hobby-servo.png)
 <br>
 
 3) A toggle switch
