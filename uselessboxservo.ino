@@ -36,9 +36,9 @@ void setup() {
   WiFi.mode(WIFI_OFF); // geen wifi functies, spaart stroom ook
   
   // hier de servo's aansluitingen opgeven en ze in de rust stand zetten, armpje in en deksel dicht
-  ServoDeksel.attach(0, 500, 2500); // aansluiting GPIO0 of ook wel D3 genoemd
+  ServoDeksel.attach(0, 500, 2500); // gele aansluiting GPIO0 of ook wel D3 genoemd
   ServoDeksel.write(DEKSEL_DICHT);  
-  ServoArmpje.attach(5, 500, 2600); // aansluiting GPIO5 of ook wel D1 genoemd
+  ServoArmpje.attach(5, 500, 2600); // oranje aansluiting GPIO5 of ook wel D1 genoemd
   ServoArmpje.write(ARMPJE_IN);  
 
   // de schakelaar is aangesloten op massa (G) en ingang D2 (GPIO4)
@@ -118,8 +118,8 @@ void loop() {
       break;
 
     case 3: // nu het armpje naar buiten
-      if(AnimatieTimer > 4000 && AnimatieTimer < 5000 )
-      { Angle = map(AnimatieTimer, 4000, 5000, ARMPJE_IN, ArmSlag);
+      if(AnimatieTimer > 4000 && AnimatieTimer < 4500 )
+      { Angle = map(AnimatieTimer, 4000, 4500, ARMPJE_IN, ArmSlag);
         Serial.printf("Arm Angle = %d\n", Angle);
         ServoArmpje.write(Angle);
       }
