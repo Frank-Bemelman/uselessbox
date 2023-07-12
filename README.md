@@ -35,9 +35,11 @@ Load files into the Arduino IDE and save as a new sketch.
 
 Arduino IDE settings:
 Under File -> preferences:
+(NL: Bestand -> Voorkeuren)
 Board Manager URL's: http://arduino.esp8266.com/stable/package_esp8266com_index.json,https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json<br>
 
-Under Sketch -> Tools -> Board -> Board Manager -> ESP8266 by community 3.1.2 install
+Under Tools -> Board -> Board Manager -> ESP8266 by community 3.1.2 install
+(NL: Hulpmiddelen -> Board -> Boord Beheer -> ESP8266 by community 3.1.2 install
 
 
 Board NODEMCU 1.0 ESP-12E Module<br>
